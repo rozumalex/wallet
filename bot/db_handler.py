@@ -4,7 +4,7 @@ from datetime import datetime
 
 import db_map as db
 from settings import config
-from lexicon import separator, commands
+from lexicon import separator
 
 engine = create_engine(f'sqlite:///../{config.database.name}', echo=False)
 db.Base.metadata.create_all(engine)
@@ -316,7 +316,8 @@ class Transaction(db.Transaction):
                         report[command][category] = transaction.value
                     else:
                         if category in report[command]:
-                            report[command][category][subcategory] = transaction.value
+                            report[command][category][
+                                subcategory] = transaction.value
                         else:
                             report[command][category] = {}
                             report[command][category][
