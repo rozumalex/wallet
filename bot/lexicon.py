@@ -34,7 +34,3 @@ separator = ' > '
 
 commands = DotMap(COMMANDS)
 messages = DotMap(MESSAGES)
-
-for i in commands.main_menu.values():
-    print(i)
-print(commands.main_menu.values())

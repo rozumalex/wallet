@@ -4,7 +4,7 @@ from datetime import datetime
 
 import db_map as db
 from settings import config
-from lexicon import separator
+from lexicon import separator, commands
 
 engine = create_engine(f'sqlite:///../{config.database.name}', echo=False)
 db.Base.metadata.create_all(engine)
@@ -288,15 +288,49 @@ class Transaction(db.Transaction):
             print(e)
             return False
         else:
-            report = {}
+            report = {'Доход': {},
+                      'Расход': {},
+                      }
             for transaction in transactions:
-                name = transaction.name
-                if name in report:
-                    report[name] += transaction.value
+                command = transaction.command
+                category = transaction.category
+                subcategory = transaction.subcategory
+
+                if category in report[command]:
+                    if subcategory is None:
+                        report[command][category] += transaction.value
+                    else:
+                        if category in report[command]:
+                            if subcategory in report[command]:
+                                report[command][category][
+                                    subcategory] += transaction.value
+                            else:
+                                report[command][category][
+                                    subcategory] = transaction.value
+                        else:
+                            report[command][category] = {}
+                            report[command][category][
+                                subcategory] += transaction.value
                 else:
-                    report[name] = transaction.value
+                    if subcategory is None:
+                        report[command][category] = transaction.value
+                    else:
+                        if category in report[command]:
+                            report[command][category][subcategory] = transaction.value
+                        else:
+                            report[command][category] = {}
+                            report[command][category][
+                                subcategory] = transaction.value
             result = ''
             for key, value in sorted(report.items()):
-                result += f'\n{key}: {value}'
+                result += f'\n {key}:'
+                for key, value in sorted(value.items()):
+                    if type(value) == dict:
+                        result += f'\n  {key}:'
+                        for key, value in sorted(value.items()):
+                            result += f'\n   {key}: {str(value)}'
+                    else:
+                        result += f'\n    {key}: {str(value)}'
+            return result
         finally:
             session.close()

@@ -59,13 +59,6 @@ def get_markup(message):
     if memory[0] == commands.none:
         for command in commands.main_menu.values():
             markup.row(command)
-    elif memory[0] in commands.main_menu.values():
-        if memory[0] == commands.main_menu.expense and len(memory) == 2:
-            for category in Category.get_subcategories(message):
-                markup.row(category)
-        elif len(memory) == 1:
-            for category in Category.get_all(message):
-                markup.row(category)
     elif memory[0] == commands.main_menu.report:
         if len(memory) == 1:
             for year in Transaction.get_years(message):
@@ -73,6 +66,13 @@ def get_markup(message):
         if len(memory) == 2:
             for month in Transaction.get_months(message):
                 markup.row(month)
+    elif memory[0] in commands.main_menu.values():
+        if memory[0] == commands.main_menu.expense and len(memory) == 2:
+            for category in Category.get_subcategories(message):
+                markup.row(category)
+        elif len(memory) == 1:
+            for category in Category.get_all(message):
+                markup.row(category)
     if memory[0] != commands.none:
         markup.row(commands.cancel)
     return markup
@@ -106,7 +106,7 @@ def select_year(message):
 @check_cancel
 def select_month(message):
     Chat.set(message)
-    msg = messages.report + Transaction.get_report(message)
+    msg = Transaction.get_report(message)
     Chat.reset(message)
     markup = get_markup(message)
     bot.send_message(message.chat.id, msg, reply_markup=markup)
