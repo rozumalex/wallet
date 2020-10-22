@@ -301,7 +301,7 @@ class Transaction(db.Transaction):
                         report[command][category] += transaction.value
                     else:
                         if category in report[command]:
-                            if subcategory in report[command]:
+                            if subcategory in report[command][category]:
                                 report[command][category][
                                     subcategory] += transaction.value
                             else:
@@ -309,19 +309,31 @@ class Transaction(db.Transaction):
                                     subcategory] = transaction.value
                         else:
                             report[command][category] = {}
-                            report[command][category][
-                                subcategory] += transaction.value
+                            if subcategory in report[command][category]:
+                                report[command][category][
+                                    subcategory] += transaction.value
+                            else:
+                                report[command][category][
+                                    subcategory] = transaction.value
                 else:
                     if subcategory is None:
                         report[command][category] = transaction.value
                     else:
                         if category in report[command]:
-                            report[command][category][
-                                subcategory] = transaction.value
+                            if subcategory in report[command][category]:
+                                report[command][category][
+                                    subcategory] += transaction.value
+                            else:
+                                report[command][category][
+                                    subcategory] = transaction.value
                         else:
                             report[command][category] = {}
-                            report[command][category][
-                                subcategory] = transaction.value
+                            if subcategory in report[command][category]:
+                                report[command][category][
+                                    subcategory] += transaction.value
+                            else:
+                                report[command][category][
+                                    subcategory] = transaction.value
             result = ''
             for key, value in sorted(report.items()):
                 result += f'\n {key}:'
@@ -329,9 +341,9 @@ class Transaction(db.Transaction):
                     if type(value) == dict:
                         result += f'\n  {key}:'
                         for key, value in sorted(value.items()):
-                            result += f'\n   {key}: {str(value)}'
+                            result += f'\n   {key}: {str(float("{:.3f}".format(value)))}'
                     else:
-                        result += f'\n    {key}: {str(value)}'
+                        result += f'\n    {key}: {str(float("{:.3f}".format(value)))}'
             return result
         finally:
             session.close()
