@@ -341,9 +341,11 @@ class Transaction(db.Transaction):
                     if type(value) == dict:
                         result += f'\n  {key}:'
                         for key, value in sorted(value.items()):
-                            result += f'\n   {key}: {str(float("{:.3f}".format(value)))}'
+                            result += f'\n   {key}: ' \
+                                      f'{str(float("{:.3f}".format(value)))}'
                     else:
-                        result += f'\n    {key}: {str(float("{:.3f}".format(value)))}'
+                        result += f'\n    {key}: ' \
+                                  f'{str(float("{:.3f}".format(value)))}'
             return result
         finally:
             session.close()
